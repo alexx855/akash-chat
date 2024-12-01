@@ -1,0 +1,43 @@
+---
+version: "2.0"
+services:
+  webapp:
+    image: alexpedersen/akash-chat-tools:0.0.3
+    expose:
+      - port: 3000
+        as: 80
+        to:
+          - global: true
+    env:
+      - DEFAULT_MODEL=llama3-groq-tool-use
+      - DEFAULT_SYSTEM_PROMPT=You are a helpful and friendly assistant. Follow the user's instructions carefully. Don't use emojis or slang. Provide accurate and helpful information.
+      - NEXT_PUBLIC_IMAGE_TOOL=
+      - NEXT_PUBLIC_AUDIO_TOOL=
+      # - API_HOST=http://provider.europlots.com:31360/
+      # Since hosting the model its expensive, i will be using the groq api to get the results
+      - GROQ_API_KEY=
+      - GROQ_API_HOST=https://api.groq.com/openai/v1
+
+profiles:
+  compute:
+    webapp:
+      resources:
+        cpu:
+          units: 2
+        memory:
+          size: 512Mi
+        storage:
+          - size: 1Gi
+
+  placement:
+    dcloud:
+      pricing:
+        webapp:
+          denom: uakt
+          amount: 1000
+
+deployment:
+  webapp:
+    dcloud:
+      profile: webapp
+      count: 1
